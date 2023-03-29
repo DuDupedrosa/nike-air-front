@@ -1,8 +1,6 @@
-import { url } from 'inspector';
 import React from 'react';
 import bgLeft from '../../assets/images/blur-left.png';
-import bgRight from '../../assets/images/blur-Right.png';
-import Image from 'next/image';
+import bgRight from '../../assets/images/blur-right.png';
 import TheHeader from '../TheHeader';
 import GenerateLayoutButton from '../Buttons/GenerateLayout';
 import Select from 'react-select';
