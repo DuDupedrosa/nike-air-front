@@ -6,12 +6,20 @@ import Image from 'next/image';
 import TheHeader from '../TheHeader';
 import GenerateLayoutButton from '../Buttons/GenerateLayout';
 import Select from 'react-select';
+import useMedia from '@/hooks/useMedia';
+import RequiredInputDefault from '../Messages/RequiredInputDefault';
 
 const TheHome = () => {
   const [selectedOption, setSelectedOption] = React.useState<{
     label: string;
     value: string;
   } | null>();
+  const [productTheme, setProductTheme] = React.useState<string>('');
+  const [requiredInputsMessage, setRequiredInputMessages] =
+    React.useState<boolean>(false);
+  const [submitEvent, setSubmitEvent] = React.useState<boolean>(true);
+
+  const mobile = useMedia('(max-width:769px)');
 
   const colourStyles = {
     control: (styles: any) => ({
@@ -71,6 +79,41 @@ const TheHome = () => {
     setSelectedOption(e);
   };
 
+  const handleGenerate = (
+    e:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    if (checkForm()) {
+      setSubmitEvent(true);
+      setRequiredInputMessages(false);
+    } else {
+      setSubmitEvent(false);
+    }
+  };
+
+  const checkForm = () => {
+    let check;
+
+    if (!selectedOption || !productTheme.length) {
+      setRequiredInputMessages(true);
+      check = false;
+    } else {
+      setRequiredInputMessages(false);
+      check = true;
+    }
+
+    return check;
+  };
+
+  React.useEffect(() => {
+    if (!submitEvent) {
+      checkForm();
+    }
+  }, [selectedOption, productTheme]);
+
   return (
     <div
       className="bg-main h-screen"
@@ -78,13 +121,13 @@ const TheHome = () => {
         backgroundImage: `url(${bgLeft.src}), url(${bgRight.src})`,
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'bottom left, top right',
-        backgroundSize: '600px, 600px',
+        backgroundSize: `${mobile ? '0px, 0px' : '600px, 600px'}`,
       }}
     >
       <div className="md:pl-16 md:pr-16 pl-5 pr-5">
         <TheHeader />
         <div className="grid place-items-center mt-24">
-          <h1 className="text-6xl max-w-[820px] leading-normal font-poppins font-bold text-[#d1d5db] text-center">
+          <h1 className="text-4xl md:text-6xl max-w-[820px] leading-normal font-poppins font-bold text-[#d1d5db] text-center">
             Generating dream layouts{' '}
             <span className="text-[#8257E5]">using AI</span> for everyone.
           </h1>
@@ -95,9 +138,9 @@ const TheHome = () => {
             corporis.
           </p>
           <div className="mt-16">
-            <form>
+            <form onSubmit={(e) => handleGenerate(e)}>
               <div className="flex items-end gap-4">
-                <div className="w-[220px]">
+                <div className="md:w-[220px]">
                   <label
                     htmlFor="product"
                     className="block text-white text-lg mb-2 font-poppins"
@@ -113,7 +156,7 @@ const TheHome = () => {
                     onChange={(e) => handleSelectedOptions(e)}
                   />
                 </div>
-                <div className="w-[220px]">
+                <div className="md:w-[220px]">
                   <label
                     htmlFor="theme"
                     className="block text-white text-lg mb-2 font-poppins"
@@ -121,13 +164,22 @@ const TheHome = () => {
                     Tema
                   </label>
                   <input
+                    onChange={(e) => setProductTheme(e.target.value)}
                     type="text"
                     name="theme"
                     className="text-base text-black font-roboto p-2 w-full border-2 border-solid border-[#111111] rounded-lg"
                   />
                 </div>
               </div>
-              <div className="grid place-items-center mt-8">
+              <div>
+                {requiredInputsMessage && (
+                  <RequiredInputDefault message="Ambos os campos acima, são necessários." />
+                )}
+              </div>
+              <div
+                className="grid place-items-center mt-8"
+                onClick={(e) => handleGenerate(e)}
+              >
                 <GenerateLayoutButton />
               </div>
             </form>
